@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/thread.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="thread-container" data-locked="{{ thread.locked|lower }}">
+    <!-- Thread Navigation -->
+    <div class="thread-navigation mb-2">
+        <a href="{{ url_for('boards.view_board', board_slug=board.slug) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to /{{ board.slug }}/
+        </a>
+    </div>
+    
+    <!-- Thread Info -->
+    <div class="thread-info premium-header mb-2">
+        <h1 class="mt-2 mb-1">
+            {% if thread.sticky %}
+                <span class="sticky-label">Sticky</span>
+            {% endif %}
+            {% if thread.locked %}
+                <span class="locked-label">Locked</span>
+            {% endif %}
+            {{ thread.subject or 'Thread #' + thread.id|string }}
+        </h1>
+        <div class="thread-meta">
+            <span>{{ thread.upvotes }} upvotes</span> • 
+            <span>{{ thread.views }} views</span> •
+            <span>{{ thread.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+        
+        <!-- Admin/Mod Actions -->
+        {% if current_user.is_authenticated and current_user.is_admin %}
+            <div class="admin-actions mt-2">
+                <a href="{{ url_for('admin.moderate_thread', thread_id=thread.id) }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-wrench"></i> Moderate Thread
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Thread Posts -->
+    <div class="posts-container">
+        {% for post_data in posts_with_images %}
+            {% set post = post_data.post %}
+            {% set images = post_data.images %}
+            
+            <div id="post-{{ post.id }}" class="post {% if loop.index == 1 %}op-post{% endif %} premium-border">
+                <div class="post-header">
+                    <div class="post-info">
+                        <span class="post-id">#{{ post.id }}</span>
+                        <span class="post-author">{{ post.poster_name }}</span>
+                    </div>
+                    <div class="post-time">
+                        {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </div>
+                </div>
+                
+                <!-- Post Images -->
+                {% if images %}
+                    <div class="post-images">
+                        {% for image in images %}
+                            <div class="image-container">
+                                <img src="{{ image.public_url }}" alt="Post image" class="post-image" data-full-url="{{ image.public_url }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Post Content -->
+                <div class="post-content">
+                    <div class="post-text">{{ post.content|nl2br }}</div>
+                </div>
+                
+                <!-- Post Actions -->
+                <div class="post-actions mt-2">
+                    <button class="reply-button btn btn-secondary btn-sm" data-post-id="{{ post.id }}">
+                        <i class="fas fa-reply"></i> Quote
+                    </button>
+                    
+                    {% if current_user.is_authenticated %}
+                        <form action="{{ url_for('threads.upvote_post', board_slug=board.slug, thread_id=thread.id, post_id=post.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-arrow-up"></i> Upvote ({{ post.upvotes }})
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                        <a href="{{ url_for('admin.moderate_post', post_id=post.id) }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-wrench"></i> Moderate
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Reply Form -->
+    {% if not thread.locked %}
+        <div class="reply-form form-container mt-4">
+            <h3 class="form-title">Post a Reply</h3>
+            
+            <form action="{{ url_for('threads.reply', board_slug=board.slug, thread_id=thread.id) }}" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    <label class="form-label">Comment</label>
+                    {{ form.content(class="form-control", placeholder="Write your reply here...") }}
+                    {% if form.content.errors %}
+                        <div class="form-errors">
+                            {% for error in form.content.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Image (optional)</label>
+                    {{ form.image(class="form-file") }}
+                    {% if form.image.errors %}
+                        <div class="form-errors">
+                            {% for error in form.image.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="form-text">
+                        Allowed file types: jpg, jpeg, png, gif, webp
+                    </div>
+                </div>
+                
+                <div class="captcha-container">
+                    <input type="hidden" name="captcha_token" id="captcha_token" value="">
+                    <label class="form-label">Verification</label>
+                    <div>
+                        <img id="captcha_image" src="" alt="CAPTCHA" class="captcha-image mb-1">
+                        <a href="#" class="captcha-refresh">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </a>
+                    </div>
+                    {{ form.captcha_solution(class="form-control", placeholder="Enter the text from the image") }}
+                    {% if form.captcha_solution.errors %}
+                        <div class="form-errors">
+                            {% for error in form.captcha_solution.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-2">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="thread-locked-notice mt-4 mb-4 p-2 text-center premium-border">
+            <i class="fas fa-lock"></i> This thread is locked. You cannot reply.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

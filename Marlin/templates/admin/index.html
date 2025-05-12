@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Marlin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="mt-0 mb-0">Marlin Administration</h1>
+    </div>
+    
+    <div class="admin-menu d-flex flex-wrap gap-2 mt-2 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.boards') }}" class="btn btn-primary">
+            <i class="fas fa-th-list"></i> Manage Boards
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('boards.index') }}" class="btn btn-secondary">
+            <i class="fas fa-home"></i> Return to Site
+        </a>
+    </div>
+    
+    <div class="admin-welcome premium-border">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">Welcome, {{ current_user.username }}</h2>
+        </div>
+        <div class="p-2">
+            <p>Welcome to the Marlin administration panel. From here, you can manage all aspects of your imageboard.</p>
+            <p>Select an option from the menu above to get started.</p>
+            
+            <div class="admin-quicklinks mt-4">
+                <h3>Quick Actions</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('admin.boards') }}" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Add New Board
+                    </a>
+                    <a href="{{ url_for('boards.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-eye"></i> View Site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-help mt-4 premium-border">
+        <div class="premium-header">
+            <h3 class="mt-0 mb-0">Administration Guide</h3>
+        </div>
+        <div class="p-2">
+            <p><strong>Dashboard:</strong> View site statistics and recent activity</p>
+            <p><strong>Manage Boards:</strong> Create, edit, or delete boards</p>
+            <p><strong>Manage Users:</strong> Administer user accounts and permissions</p>
+            <p><strong>Thread Moderation:</strong> Access by viewing any thread and using the moderate option</p>
+            <p><strong>Post Moderation:</strong> Access by viewing any post and using the moderate option</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

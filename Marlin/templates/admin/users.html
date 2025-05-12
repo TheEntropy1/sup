@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Marlin Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="mt-0 mb-0">Manage Users</h1>
+    </div>
+    
+    <div class="admin-menu d-flex flex-wrap gap-2 mt-2 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.boards') }}" class="btn btn-primary">
+            <i class="fas fa-th-list"></i> Manage Boards
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Admin Home
+        </a>
+    </div>
+    
+    <!-- Users List -->
+    <div class="admin-section premium-border">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">All Users</h2>
+        </div>
+        <div class="p-2">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Admin</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <form action="{{ url_for('admin.toggle_admin', user_id=user.id) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-sm" {% if user.id == current_user.id %}disabled{% endif %}>
+                                            {% if user.is_admin %}
+                                                <i class="fas fa-user-minus"></i> Remove Admin
+                                            {% else %}
+                                                <i class="fas fa-user-plus"></i> Make Admin
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                    
+                                    <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <button type="submit" class="btn btn-secondary btn-sm" {% if user.id == current_user.id %}disabled{% endif %}>
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No users found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- User Management Guide -->
+    <div class="admin-section content-border mt-4">
+        <div class="content-header">
+            <h3 class="mt-0 mb-0">User Management Guide</h3>
+        </div>
+        <div class="p-2">
+            <p><strong>Admin Status:</strong> Admins have access to the admin panel and can moderate all content.</p>
+            <p><strong>Deleting Users:</strong> This permanently removes the user account but keeps their posts (anonymized).</p>
+            <p><strong>Security Notes:</strong></p>
+            <ul>
+                <li>You cannot remove your own admin privileges or delete your own account.</li>
+                <li>Passwords are securely hashed and cannot be viewed, even by admins.</li>
+                <li>Email addresses are only used for account recovery and never displayed publicly.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

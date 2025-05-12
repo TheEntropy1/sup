@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Boards - Marlin Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="mt-0 mb-0">Manage Boards</h1>
+    </div>
+    
+    <div class="admin-menu d-flex flex-wrap gap-2 mt-2 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.boards') }}" class="btn btn-primary">
+            <i class="fas fa-th-list"></i> Manage Boards
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Admin Home
+        </a>
+    </div>
+    
+    <div class="admin-actions mb-4">
+        <a href="{{ url_for('admin.new_board') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Board
+        </a>
+    </div>
+    
+    <!-- Boards List -->
+    <div class="admin-section premium-border">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">All Boards</h2>
+        </div>
+        <div class="p-2">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Slug</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>NSFW</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for board in boards %}
+                        <tr>
+                            <td>{{ board.id }}</td>
+                            <td>/{{ board.slug }}/</td>
+                            <td>{{ board.name }}</td>
+                            <td>{{ board.category }}</td>
+                            <td>{{ 'Yes' if board.nsfw else 'No' }}</td>
+                            <td>{{ board.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{{ url_for('boards.view_board', board_slug=board.slug) }}" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <a href="{{ url_for('admin.edit_board', board_id=board.id) }}" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form action="{{ url_for('admin.delete_board', board_id=board.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this board? All threads and posts will be permanently deleted!');">
+                                        <button type="submit" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No boards found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Board Management Guide -->
+    <div class="admin-section content-border mt-4">
+        <div class="content-header">
+            <h3 class="mt-0 mb-0">Board Management Guide</h3>
+        </div>
+        <div class="p-2">
+            <p><strong>Creating a Board:</strong> Click "Create New Board" and fill in the required information.</p>
+            <p><strong>Editing a Board:</strong> Click the "Edit" button next to a board to modify its details.</p>
+            <p><strong>Deleting a Board:</strong> Click the "Delete" button. This will permanently remove the board and all its content!</p>
+            <p><strong>Categories:</strong> Boards are grouped by categories (e.g., "Video Games", "Creative", "Interests").</p>
+            <p><strong>NSFW Flag:</strong> Mark adult content boards as NSFW to allow content filtering.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+apscheduler==3.10.1
+email-validator==2.0.0
+flask==2.3.3
+flask-login==0.6.2
+flask-sqlalchemy==3.0.5
+flask-wtf==1.1.1
+gunicorn==23.0.0
+pillow==10.0.0
+psycopg2-binary==2.9.7
+python-dotenv==1.0.0
+werkzeug==2.3.7

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Marlin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="mt-0 mb-0">Admin Dashboard</h1>
+    </div>
+    
+    <div class="admin-menu d-flex flex-wrap gap-2 mt-2 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.boards') }}" class="btn btn-primary">
+            <i class="fas fa-th-list"></i> Manage Boards
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Admin Home
+        </a>
+    </div>
+    
+    <!-- Statistics Overview -->
+    <div class="admin-section premium-border">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">Site Statistics</h2>
+        </div>
+        <div class="stats-grid d-flex flex-wrap gap-2 p-2">
+            <div class="stat-card p-2" style="flex: 1; min-width: 200px; background-color: #f0e6d0; border-radius: 4px; text-align: center;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: bold; color: #8b4513;">{{ total_users }}</div>
+                <div class="stat-label">Registered Users</div>
+            </div>
+            <div class="stat-card p-2" style="flex: 1; min-width: 200px; background-color: #f0e6d0; border-radius: 4px; text-align: center;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: bold; color: #8b4513;">{{ total_boards }}</div>
+                <div class="stat-label">Boards</div>
+            </div>
+            <div class="stat-card p-2" style="flex: 1; min-width: 200px; background-color: #f0e6d0; border-radius: 4px; text-align: center;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: bold; color: #8b4513;">{{ total_threads }}</div>
+                <div class="stat-label">Threads</div>
+            </div>
+            <div class="stat-card p-2" style="flex: 1; min-width: 200px; background-color: #f0e6d0; border-radius: 4px; text-align: center;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: bold; color: #8b4513;">{{ total_posts }}</div>
+                <div class="stat-label">Total Posts</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Threads -->
+    <div class="admin-section content-border mt-4">
+        <div class="content-header">
+            <h2 class="mt-0 mb-0">Recent Threads</h2>
+        </div>
+        <div class="p-2">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Board</th>
+                        <th>Created</th>
+                        <th>Views</th>
+                        <th>Upvotes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for thread in recent_threads %}
+                        <tr>
+                            <td>{{ thread.id }}</td>
+                            <td>{{ thread.subject or 'No Subject' }}</td>
+                            <td>/{{ thread.board.slug }}/</td>
+                            <td>{{ thread.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ thread.views }}</td>
+                            <td>{{ thread.upvotes }}</td>
+                            <td>
+                                <a href="{{ url_for('threads.view_thread', board_slug=thread.board.slug, thread_id=thread.id) }}" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{{ url_for('admin.moderate_thread', thread_id=thread.id) }}" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-wrench"></i> Moderate
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No recent threads</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Popular Threads -->
+    <div class="admin-section content-border mt-4">
+        <div class="content-header">
+            <h2 class="mt-0 mb-0">Popular Threads</h2>
+        </div>
+        <div class="p-2">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Board</th>
+                        <th>Created</th>
+                        <th>Views</th>
+                        <th>Upvotes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for thread in popular_threads %}
+                        <tr>
+                            <td>{{ thread.id }}</td>
+                            <td>{{ thread.subject or 'No Subject' }}</td>
+                            <td>/{{ thread.board.slug }}/</td>
+                            <td>{{ thread.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ thread.views }}</td>
+                            <td>{{ thread.upvotes }}</td>
+                            <td>
+                                <a href="{{ url_for('threads.view_thread', board_slug=thread.board.slug, thread_id=thread.id) }}" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{{ url_for('admin.moderate_thread', thread_id=thread.id) }}" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-wrench"></i> Moderate
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No popular threads</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Moderation Notes -->
+    <div class="admin-section content-border mt-4">
+        <div class="content-header">
+            <h2 class="mt-0 mb-0">Moderation Notes</h2>
+        </div>
+        <div class="p-2">
+            <ul>
+                <li>Thread cleanup runs automatically every 24 hours</li>
+                <li>Threads older than 4 months with few upvotes and views are automatically removed</li>
+                <li>Images stored on Mega.nz are also cleaned up during this process</li>
+                <li>Use the "Moderate" button on threads and posts to lock/sticky/delete content</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

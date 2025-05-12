@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Moderate Thread - Marlin Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="mt-0 mb-0">Moderate Thread</h1>
+    </div>
+    
+    <div class="admin-menu d-flex flex-wrap gap-2 mt-2 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.boards') }}" class="btn btn-primary">
+            <i class="fas fa-th-list"></i> Manage Boards
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Admin Home
+        </a>
+    </div>
+    
+    <!-- Thread Preview -->
+    <div class="thread-preview premium-border mb-4">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">Thread Preview</h2>
+        </div>
+        <div class="p-2">
+            <div class="thread-details">
+                <p><strong>ID:</strong> {{ thread.id }}</p>
+                <p><strong>Board:</strong> /{{ thread.board.slug }}/ - {{ thread.board.name }}</p>
+                <p><strong>Subject:</strong> {{ thread.subject or 'No Subject' }}</p>
+                <p><strong>Created:</strong> {{ thread.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>Upvotes:</strong> {{ thread.upvotes }}</p>
+                <p><strong>Views:</strong> {{ thread.views }}</p>
+                <p><strong>Current Status:</strong> 
+                    {% if thread.sticky %}Sticky{% else %}Not Sticky{% endif %}, 
+                    {% if thread.locked %}Locked{% else %}Unlocked{% endif %}
+                </p>
+            </div>
+            
+            <div class="thread-actions mt-2">
+                <a href="{{ url_for('threads.view_thread', board_slug=thread.board.slug, thread_id=thread.id) }}" class="btn btn-secondary" target="_blank">
+                    <i class="fas fa-eye"></i> View Full Thread
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Moderation Form -->
+    <div class="form-container premium-border">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">Moderation Actions</h2>
+        </div>
+        <form method="post" action="{{ url_for('admin.moderate_thread', thread_id=thread.id) }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.sticky(class="form-check-input") }}
+                    <label class="form-check-label" for="sticky">
+                        {{ form.sticky.label }}
+                    </label>
+                </div>
+                <div class="form-text">Sticky threads always appear at the top of the board.</div>
+            </div>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.locked(class="form-check-input") }}
+                    <label class="form-check-label" for="locked">
+                        {{ form.locked.label }}
+                    </label>
+                </div>
+                <div class="form-text">Locked threads cannot receive new replies.</div>
+            </div>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.delete(class="form-check-input") }}
+                    <label class="form-check-label" for="delete">
+                        {{ form.delete.label }}
+                    </label>
+                </div>
+                <div class="form-text text-danger">Warning: This will permanently delete the thread and all its posts!</div>
+            </div>
+            
+            <div class="form-group mt-4">
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('threads.view_thread', board_slug=thread.board.slug, thread_id=thread.id) }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Moderation Guidelines -->
+    <div class="admin-section premium-border mt-4">
+        <div class="premium-header">
+            <h3 class="mt-0 mb-0">Moderation Guidelines</h3>
+        </div>
+        <div class="p-2">
+            <p><strong>Sticky:</strong> Use for important announcements or high-quality discussion threads.</p>
+            <p><strong>Locked:</strong> Use when a thread has run its course or is becoming problematic.</p>
+            <p><strong>Delete:</strong> Only use for threads that violate site rules or contain illegal content.</p>
+            <p>Remember that moderation actions are visible to users and reflect on the site's administration.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

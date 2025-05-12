@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Moderate Post - Marlin Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="mt-0 mb-0">Moderate Post</h1>
+    </div>
+    
+    <div class="admin-menu d-flex flex-wrap gap-2 mt-2 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.boards') }}" class="btn btn-primary">
+            <i class="fas fa-th-list"></i> Manage Boards
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Admin Home
+        </a>
+    </div>
+    
+    <!-- Post Preview -->
+    <div class="post-preview premium-border mb-4">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">Post Preview</h2>
+        </div>
+        <div class="p-2">
+            <div class="post-details">
+                <p><strong>ID:</strong> {{ post.id }}</p>
+                <p><strong>Thread:</strong> #{{ post.thread_id }} on /{{ post.thread.board.slug }}/</p>
+                <p><strong>Author:</strong> {{ post.poster_name }}</p>
+                <p><strong>Created:</strong> {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>Upvotes:</strong> {{ post.upvotes }}</p>
+            </div>
+            
+            <div class="post-content mt-2 p-2" style="background-color: #f0e6d0; border-radius: 4px;">
+                {{ post.content|nl2br }}
+            </div>
+            
+            {% if post.images.count() > 0 %}
+                <div class="post-images mt-2">
+                    <p><strong>Images:</strong></p>
+                    <div class="d-flex gap-2">
+                        {% for image in post.images %}
+                            <div class="image-container">
+                                <img src="{{ image.public_url }}" alt="Post image" style="max-width: 150px; max-height: 150px;">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="post-actions mt-2">
+                <a href="{{ url_for('threads.view_thread', board_slug=post.thread.board.slug, thread_id=post.thread_id) }}#post-{{ post.id }}" class="btn btn-secondary" target="_blank">
+                    <i class="fas fa-eye"></i> View in Thread
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Moderation Form -->
+    <div class="form-container premium-border">
+        <div class="premium-header">
+            <h2 class="mt-0 mb-0">Moderation Actions</h2>
+        </div>
+        <form method="post" action="{{ url_for('admin.moderate_post', post_id=post.id) }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.delete(class="form-check-input") }}
+                    <label class="form-check-label" for="delete">
+                        {{ form.delete.label }}
+                    </label>
+                </div>
+                <div class="form-text text-danger">Warning: This will permanently delete the post and any images attached to it!</div>
+            </div>
+            
+            <div class="form-group mt-4">
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('threads.view_thread', board_slug=post.thread.board.slug, thread_id=post.thread_id) }}#post-{{ post.id }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Moderation Guidelines -->
+    <div class="admin-section content-border mt-4">
+        <div class="content-header">
+            <h3 class="mt-0 mb-0">Moderation Guidelines</h3>
+        </div>
+        <div class="p-2">
+            <p><strong>Delete:</strong> Only use for posts that violate site rules or contain illegal content.</p>
+            <p>Consider the following when moderating posts:</p>
+            <ul>
+                <li>Is the content illegal or infringing on copyright?</li>
+                <li>Does the post contain harassment, doxxing, or personal attacks?</li>
+                <li>Is the post completely off-topic or disruptive to the thread?</li>
+                <li>Does the post contain spam or advertisements?</li>
+            </ul>
+            <p>If the issue is minor, consider leaving the post but contacting the user privately.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

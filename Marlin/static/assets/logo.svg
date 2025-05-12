@@ -1,0 +1,26 @@
+<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-text {
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+      font-size: 36px;
+      fill: #8b4513;
+    }
+    .tagline {
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+      fill: #8b4513;
+    }
+    .fish {
+      fill: #8b4513;
+    }
+  </style>
+  
+  <!-- Fish icon -->
+  <path class="fish" d="M40 25c0 0-10-15-25-15C5 10 0 15 0 25s5 15 15 15c15 0 25-15 25-15z" />
+  <circle class="fish" cx="10" cy="20" r="2" fill="white" />
+  
+  <!-- Text -->
+  <text x="55" y="35" class="logo-text">MARLIN</text>
+  <text x="55" y="45" class="tagline">Premium Imageboard</text>
+</svg>

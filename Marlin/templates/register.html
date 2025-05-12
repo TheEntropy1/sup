@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="content-header">
+        <h1 class="mt-2 mb-2">Register</h1>
+    </div>
+    
+    <div class="form-container content-border">
+        <form method="post" action="{{ url_for('auth.register') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.username.label }}</label>
+                {{ form.username(class="form-control", placeholder="Choose a username") }}
+                {% if form.username.errors %}
+                    <div class="form-errors">
+                        {% for error in form.username.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.email.label }}</label>
+                {{ form.email(class="form-control", placeholder="Enter your email address") }}
+                {% if form.email.errors %}
+                    <div class="form-errors">
+                        {% for error in form.email.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.password.label }}</label>
+                {{ form.password(class="form-control", placeholder="Choose a password") }}
+                {% if form.password.errors %}
+                    <div class="form-errors">
+                        {% for error in form.password.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.confirm_password.label }}</label>
+                {{ form.confirm_password(class="form-control", placeholder="Confirm your password") }}
+                {% if form.confirm_password.errors %}
+                    <div class="form-errors">
+                        {% for error in form.confirm_password.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group mt-2">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+    
+    <div class="auth-links mt-2 text-center">
+        <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+    </div>
+    
+    <div class="register-info mt-4 content-border">
+        <div class="content-header">
+            <h3 class="mt-0 mb-0">Why Join?</h3>
+        </div>
+        <div class="p-2">
+            <p>While Marlin allows anonymous posting, registered users enjoy additional benefits:</p>
+            <ul>
+                <li>Upvote content to help quality posts get more visibility</li>
+                <li>Track your contributions</li>
+                <li>Participate in special boards and events</li>
+                <li>Help shape the community</li>
+            </ul>
+            <p class="mb-0"><strong>Note:</strong> Your email is only used for account recovery and will never be displayed publicly.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

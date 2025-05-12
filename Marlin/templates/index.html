@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Marlin.{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="mt-2 mb-2">Marlin.</h1>
+    <p>A thoughtfully crafted space for meaningful discussions</p>
+</div>
+
+<!-- Boards Container -->
+<div class="boards-container">
+    <div class="filter-section mb-2">
+        <button class="filter-button">
+            Filter Boards <i class="fas fa-filter"></i>
+        </button>
+    </div>
+
+    {% for category, boards in boards_by_category.items() %}
+        <div class="category-section">
+            <div class="board-category">{{ category }}</div>
+            <div class="board-list">
+                {% for board in boards %}
+                    <div class="board-item">
+                        <a href="{{ url_for('boards.view_board', board_slug=board.slug) }}" class="board-link">
+                            /{{ board.slug }}/ - {{ board.name }}
+                        </a>
+                        <div class="board-description">
+                            {{ board.description }}
+                            {% if board.nsfw %}
+                                <span class="nsfw-tag">(NSFW)</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Popular Threads -->
+<div class="popular-threads-container">
+    <div class="content-header">
+        <h2 class="mt-2 mb-2">Popular Threads</h2>
+    </div>
+    
+    <div class="thread-list">
+        {% if popular_threads %}
+            {% for thread in popular_threads %}
+                <div class="thread-item content-border">
+                    <div class="thread-header">
+                        <div class="thread-subject">
+                            <a href="{{ url_for('threads.view_thread', board_slug=thread.board.slug, thread_id=thread.id) }}">
+                                {{ thread.subject or 'No Subject' }}
+                            </a>
+                        </div>
+                        <div class="thread-meta">
+                            <span>{{ thread.upvotes }} upvotes</span> • 
+                            <span>{{ thread.views }} views</span> •
+                            <span>/{{ thread.board.slug }}/</span> •
+                            <span>{{ thread.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="thread-actions">
+                        <a href="{{ url_for('threads.view_thread', board_slug=thread.board.slug, thread_id=thread.id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Thread
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state p-4 text-center">
+                <p>No popular threads yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Introduction -->
+<div class="info-container mt-4 mb-4 content-border">
+    <div class="content-header">
+        <h2 class="mt-0 mb-0">About Marlin</h2>
+    </div>
+    <div class="info-content p-3">
+        <p>
+            Marlin is a thoughtfully designed image-based discussion platform where anyone can share thoughts and images. 
+            Explore boards covering diverse topics, from technology and arts to lifestyle and hobbies.
+        </p>
+        <p>
+            Participate anonymously or create an account to upvote content and access additional features. 
+            Browse the boards above to find conversations that interest you and join the community.
+        </p>
+        <p class="mt-2">
+            <strong>Features:</strong>
+        </p>
+        <ul>
+            <li>Upvote system to highlight quality content</li>
+            <li>Elegant, minimalist design</li>
+            <li>Reliable image hosting</li>
+            <li>Responsive layout for all devices</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

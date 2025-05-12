@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="post-form-container">
+    <!-- Board Navigation -->
+    <div class="board-navigation mb-2">
+        <a href="{{ url_for('boards.view_board', board_slug=board.slug) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to /{{ board.slug }}/
+        </a>
+    </div>
+    
+    <!-- Form Header -->
+    <div class="premium-header mb-2">
+        <h1 class="mt-2 mb-1">
+            {% if is_new_thread %}
+                Create New Thread
+            {% else %}
+                Reply to Thread
+            {% endif %}
+            in /{{ board.slug }}/
+        </h1>
+    </div>
+    
+    <!-- Post Form -->
+    <div class="form-container premium-border">
+        <form action="{{ url_for('threads.new_thread', board_slug=board.slug) if is_new_thread else url_for('threads.reply', board_slug=board.slug, thread_id=thread.id) }}" method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            
+            {% if is_new_thread %}
+                <div class="form-group">
+                    <label class="form-label">Subject (optional)</label>
+                    {{ form.subject(class="form-control", placeholder="Thread subject") }}
+                    {% if form.subject.errors %}
+                        <div class="form-errors">
+                            {% for error in form.subject.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label class="form-label">Comment</label>
+                {{ form.content(class="form-control", placeholder="Write your post here...") }}
+                {% if form.content.errors %}
+                    <div class="form-errors">
+                        {% for error in form.content.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Image (optional)</label>
+                {{ form.image(class="form-file") }}
+                {% if form.image.errors %}
+                    <div class="form-errors">
+                        {% for error in form.image.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="form-text">
+                    Allowed file types: jpg, jpeg, png, gif, webp
+                </div>
+            </div>
+            
+            <div class="captcha-container">
+                <input type="hidden" name="captcha_token" id="captcha_token" value="">
+                <label class="form-label">Verification</label>
+                <div>
+                    <img id="captcha_image" src="" alt="CAPTCHA" class="captcha-image mb-1">
+                    <a href="#" class="captcha-refresh">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </a>
+                </div>
+                {{ form.captcha_solution(class="form-control", placeholder="Enter the text from the image") }}
+                {% if form.captcha_solution.errors %}
+                    <div class="form-errors">
+                        {% for error in form.captcha_solution.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group mt-2">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+    
+    <!-- Board Rules -->
+    <div class="board-rules mt-4 content-border">
+        <div class="content-header">
+            <h3 class="mt-0 mb-0">Board Guidelines</h3>
+        </div>
+        <div class="p-2">
+            <ul>
+                <li>Be respectful to other users.</li>
+                <li>Do not post illegal content.</li>
+                <li>Do not spam or post advertisements.</li>
+                <li>Follow the specific rules of /{{ board.slug }}/.</li>
+                <li>Use spoiler tags for sensitive content.</li>
+                <li>Threads and posts with many upvotes will remain longer.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize captcha
+    const tokenInput = document.getElementById('captcha_token');
+    const captchaImage = document.getElementById('captcha_image');
+    const refreshButton = document.querySelector('.captcha-refresh');
+    
+    function loadCaptcha() {
+        fetch('/captcha/generate')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    tokenInput.value = data.token;
+                    captchaImage.src = 'data:image/png;base64,' + data.image;
+                }
+            });
+    }
+    
+    // Load initial captcha
+    loadCaptcha();
+    
+    // Set up refresh button
+    if (refreshButton) {
+        refreshButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            loadCaptcha();
+        });
+    }
+});
+</script>
+{% endblock %}

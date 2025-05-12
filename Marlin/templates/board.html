@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="board-header premium-header">
+    <h1 class="mt-2 mb-2">/{{ board.slug }}/ - {{ board.name }}</h1>
+    <p>{{ board.description }}</p>
+</div>
+
+<!-- Actions -->
+<div class="board-actions d-flex justify-between mt-2 mb-2">
+    <div>
+        <a href="{{ url_for('threads.new_thread', board_slug=board.slug) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Thread
+        </a>
+    </div>
+    
+    <div class="sort-options">
+        <a href="{{ url_for('boards.view_board', board_slug=board.slug, sort='bump') }}" 
+           class="sort-link {% if sort == 'bump' %}active{% endif %}">
+           <i class="fas fa-sort"></i> Bump Order
+        </a>
+        <a href="{{ url_for('boards.view_board', board_slug=board.slug, sort='new') }}" 
+           class="sort-link {% if sort == 'new' %}active{% endif %}">
+           <i class="fas fa-clock"></i> Newest
+        </a>
+        <a href="{{ url_for('boards.view_board', board_slug=board.slug, sort='hot') }}" 
+           class="sort-link {% if sort == 'hot' %}active{% endif %}">
+           <i class="fas fa-fire"></i> Hot
+        </a>
+    </div>
+</div>
+
+<!-- Threads -->
+<div class="thread-list">
+    {% if threads_data %}
+        {% for thread_item in threads_data %}
+            {% set thread = thread_item.thread %}
+            {% set first_post = thread_item.first_post %}
+            {% set first_image = thread_item.first_image %}
+            {% set reply_count = thread_item.reply_count %}
+            
+            <div class="thread-item {% if thread.sticky %}thread-sticky{% endif %} {% if thread.locked %}thread-locked{% endif %} premium-border">
+                <div class="thread-header">
+                    <div>
+                        {% if thread.sticky %}
+                            <span class="sticky-label">Sticky</span>
+                        {% endif %}
+                        {% if thread.locked %}
+                            <span class="locked-label">Locked</span>
+                        {% endif %}
+                        <span class="thread-subject">
+                            <a href="{{ url_for('threads.view_thread', board_slug=board.slug, thread_id=thread.id) }}">
+                                {{ thread.subject or 'No Subject' }}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="thread-meta">
+                        <span>{{ thread.upvotes }} upvotes</span> • 
+                        <span>{{ thread.views }} views</span> •
+                        <span>{{ thread.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                </div>
+                
+                {% if first_post %}
+                    <div class="thread-content">
+                        {% if first_image %}
+                            <div class="thread-image-container">
+                                <img src="{{ first_image.public_url }}" alt="Thread image" class="thread-image">
+                            </div>
+                        {% endif %}
+                        
+                        <div class="thread-text">
+                            {{ first_post.content|truncate(300) }}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="thread-footer d-flex justify-between mt-2">
+                    <div class="thread-replies">
+                        <span>{{ reply_count }} {% if reply_count == 1 %}reply{% else %}replies{% endif %}</span>
+                    </div>
+                    
+                    <div class="thread-actions">
+                        <a href="{{ url_for('threads.view_thread', board_slug=board.slug, thread_id=thread.id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Thread
+                        </a>
+                        
+                        {% if current_user.is_authenticated %}
+                            <form action="{{ url_for('threads.upvote_thread', board_slug=board.slug, thread_id=thread.id) }}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-arrow-up"></i> Upvote
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state p-4 text-center">
+            <p>No threads yet. Be the first to create one!</p>
+            <a href="{{ url_for('threads.new_thread', board_slug=board.slug) }}" class="btn btn-primary mt-2">
+                Create Thread
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+    <div class="pagination">
+        {% for page in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+            {% if page %}
+                {% if page == pagination.page %}
+                    <span class="pagination-item">
+                        <a class="pagination-link active">{{ page }}</a>
+                    </span>
+                {% else %}
+                    <span class="pagination-item">
+                        <a href="{{ url_for('boards.view_board', board_slug=board.slug, page=page, sort=sort) }}" class="pagination-link">{{ page }}</a>
+                    </span>
+                {% endif %}
+            {% else %}
+                <span class="pagination-item">...</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
